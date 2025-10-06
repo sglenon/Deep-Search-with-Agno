@@ -1,0 +1,28 @@
+2025-10-06 15:47:47,212 [INFO] INFO:root:=== Script run_deep_search.py started ===
+2025-10-06 15:47:47,212 [INFO] INFO:root:Logs are being written asynchronously to: /home/lars_lenon/CODING/Deep-Search-with-Agno/logs/run_deep_search_2025-10-06_15-47-47.log
+2025-10-06 15:47:48,445 [INFO] INFO:root:Initializing workflow...
+2025-10-06 15:47:48,474 [INFO] INFO:root:Serving FastAPI app on http://localhost:8001 (reload=False)
+2025-10-06 15:47:49,556 [INFO] INFO:httpx:HTTP Request: POST https://api.agno.com/v2/apps "HTTP/1.1 202 Accepted"
+2025-10-06 15:47:49,568 [INFO] INFO:root:[34mINFO[0m Starting API on localhost:[1;36m8001[0m
+2025-10-06 15:47:49,668 [ERROR] ERROR:root:INFO:     Started server process [1740629]
+2025-10-06 15:47:49,668 [ERROR] ERROR:root:INFO:     Waiting for application startup.
+2025-10-06 15:47:49,669 [ERROR] ERROR:root:INFO:     Application startup complete.
+2025-10-06 15:47:49,671 [ERROR] ERROR:root:INFO:     Uvicorn running on http://localhost:8001 (Press CTRL+C to quit)
+2025-10-06 15:47:57,194 [INFO] INFO:root:INFO:     127.0.0.1:44684 - "GET / HTTP/1.1" 404 Not Found
+2025-10-06 15:47:57,360 [INFO] INFO:root:INFO:     127.0.0.1:44688 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+2025-10-06 15:48:11,102 [INFO] INFO:root:INFO:     127.0.0.1:39994 - "GET /docs HTTP/1.1" 200 OK
+2025-10-06 15:48:11,566 [INFO] INFO:root:INFO:     127.0.0.1:39994 - "GET /openapi.json HTTP/1.1" 200 OK
+2025-10-06 16:00:06,981 [INFO] INFO:root:INFO:     127.0.0.1:41798 - "POST /runs?workflow_id=deep_search_workflow HTTP/1.1" 422 Unprocessable Content
+2025-10-06 16:00:30,784 [INFO] INFO:root:INFO:     127.0.0.1:35106 - "POST /runs?workflow_id=deep_search_workflow HTTP/1.1" 404 Not Found
+2025-10-06 16:01:05,605 [INFO] INFO:root:INFO:     127.0.0.1:56002 - "POST /runs?workflow_id=deep_search_team HTTP/1.1" 404 Not Found
+2025-10-06 16:03:03,200 [INFO] INFO:root:INFO:     127.0.0.1:58862 - "POST /runs?workflow_id=deep_search_team HTTP/1.1" 404 Not Found
+2025-10-06 16:06:09,097 [INFO] INFO:root:INFO:     127.0.0.1:50386 - "POST /runs?workflow_id=deep_search_team HTTP/1.1" 404 Not Found
+2025-10-06 16:06:10,400 [INFO] INFO:root:INFO:     127.0.0.1:50386 - "POST /runs?workflow_id=deep_search_team HTTP/1.1" 404 Not Found
+2025-10-06 16:06:11,483 [INFO] INFO:root:INFO:     127.0.0.1:50386 - "POST /runs?workflow_id=deep_search_team HTTP/1.1" 404 Not Found
+2025-10-06 16:06:11,659 [INFO] INFO:root:INFO:     127.0.0.1:50386 - "POST /runs?workflow_id=deep_search_team HTTP/1.1" 404 Not Found
+2025-10-06 16:06:11,819 [INFO] INFO:root:INFO:     127.0.0.1:50386 - "POST /runs?workflow_id=deep_search_team HTTP/1.1" 404 Not Found
+2025-10-06 16:06:11,990 [INFO] INFO:root:INFO:     127.0.0.1:50386 - "POST /runs?workflow_id=deep_search_team HTTP/1.1" 404 Not Found
+2025-10-06 16:06:18,948 [ERROR] ERROR:root:INFO:     Shutting down
+2025-10-06 16:06:19,050 [ERROR] ERROR:root:INFO:     Waiting for application shutdown.
+2025-10-06 16:06:19,051 [ERROR] ERROR:root:INFO:     Application shutdown complete.
+2025-10-06 16:06:19,051 [ERROR] ERROR:root:INFO:     Finished server process [1740629]

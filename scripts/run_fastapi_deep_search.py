@@ -10,6 +10,8 @@ from queue import Queue
 from logging.handlers import QueueHandler, QueueListener
 import atexit
 
+from agno.agent import Agent
+from agno.app.fastapi.app import FastAPIApp
 
 # === Load environment variables ===
 load_dotenv()
@@ -90,6 +92,9 @@ def setup_logging():
                     self.level(line.rstrip())
         def flush(self):
             pass
+        def isatty(self):
+            # Uvicorn expects sys.stdout/sys.stderr to have isatty()
+            return False
 
     sys.stdout = LoggerWriter(logging.getLogger().info)
     sys.stderr = LoggerWriter(logging.getLogger().error)
@@ -129,7 +134,7 @@ citation_style = "american chemical society"
 citation_guides_folder = PROJECT_ROOT / "tools" / "citation_guides"
 
 
-# === Build and Run Workflow ===
+# === Build and Serve FastAPI Workflow ===
 try:
     logging.info("Initializing workflow...")
     workflow = build_deep_search_workflow(
@@ -145,11 +150,34 @@ try:
         citation_style=citation_style,
         citation_guides_folder=citation_guides_folder,
     )
-    
-    topic_response = workflow.print_response(query, markdown=True)
-    logging.info("Workflow executed successfully.")
-    logging.info(f"Response:\n{topic_response}")
+
+
+    # ==== FastAPI ===
+    fastapi_app = FastAPIApp(
+        workflows=[workflow],
+        name="Deep Search Team",
+        app_id="deep_search_team",
+        description="A deep search workflow",
+    )
+
+    # The FastAPI app object (for ASGI servers, testing, etc.)
+    app = fastapi_app.get_app()
+
+    # Entrypoint for running as a FastAPI server
+    if __name__ == "__main__":
+        # Read server config from environment variables (with defaults)
+        import argparse
+
+        parser = argparse.ArgumentParser(description="Run Deep Search FastAPI server")
+        parser.add_argument("--host", type=str, default=os.getenv("FASTAPI_HOST", "localhost"), help="Host to bind")
+        parser.add_argument("--port", type=int, default=int(os.getenv("FASTAPI_PORT", "8001")), help="Port to bind")
+        parser.add_argument("--reload", action="store_true", default=os.getenv("FASTAPI_RELOAD", "False") == "True", help="Enable auto-reload")
+        args = parser.parse_args()
+
+        logging.info(f"Serving FastAPI app on http://{args.host}:{args.port} (reload={args.reload})")
+        # Use the FastAPIApp.serve() method as described in FastAPI.md
+        fastapi_app.serve(app=app, host=args.host, port=args.port, reload=args.reload)
 
 except Exception as e:
-    logging.error("An error occurred during workflow execution: %s", str(e), exc_info=True)
+    logging.error("An error occurred during FastAPI workflow setup: %s", str(e), exc_info=True)
     raise

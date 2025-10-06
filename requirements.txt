@@ -6,3 +6,4 @@ gpt_researcher
 agno==1.7.9
 googlesearch-python
 pycountry
+fastapi

@@ -138,6 +138,7 @@ def build_deep_search_workflow(
 
     return Workflow(
         name="Deep Search Pipeline",
+        workflow_id="deep_search_team",
         steps=[
             Step(name="Planning", agent=Adviser),
             Parallel(
