@@ -9,12 +9,14 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.googlesearch import GoogleSearchTools
 from agno.tools.hackernews import HackerNewsTools
 
-from tools.philippines_search_tool import PhilippinesSearchTool
-from tools.sci_paper_search_tool import SciResTool
-
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
+from tools.philippines_search_tool import PhilippinesSearchTool
+from tools.sci_paper_search_tool import SciResTool
+
+
 
 
 # === Adviser Agent ===

@@ -2,6 +2,11 @@
 
 import os
 import sys
+# Ensure project root is on PYTHONPATH
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 from agno.memory.v2.db.sqlite import SqliteMemoryDb
 from agno.memory.v2.memory import Memory
@@ -23,11 +28,6 @@ from prompts.deep_search_prompts import (
     get_supervisor_instructions as SUPERVISOR_INSTRUCTIONS,
 )
 
-# Ensure project root is on PYTHONPATH
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
 
 # === Setup ===
 memory_db = SqliteMemoryDb(table_name="memory", db_file="tmp/memory.db")
