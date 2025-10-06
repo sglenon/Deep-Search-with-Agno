@@ -38,11 +38,25 @@ def extract_final_content(json_path):
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) != 2:
-        print("Usage: python extract_content.py <path_to_json>")
+
+    if len(sys.argv) != 4:
+        print("Usage: uv run extract_content.py <json_file> <output_dir> <output_file_name>")
         sys.exit(1)
-    content = extract_final_content(sys.argv[1])
+
+    json_file = sys.argv[1]
+    output_dir = sys.argv[2]
+    output_file_name = sys.argv[3]
+
+    content = extract_final_content(json_file)
     if content:
-        print(content)
+        # Ensure output_dir exists
+        os.makedirs(output_dir, exist_ok=True)
+        # Ensure .md extension
+        if not output_file_name.lower().endswith(".md"):
+            output_file_name += ".md"
+        output_path = os.path.join(output_dir, output_file_name)
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"[INFO] Markdown file saved to: {output_path}")
     else:
         print("No content found.")

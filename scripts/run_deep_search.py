@@ -124,7 +124,10 @@ def agent_id(user_id: str, role: str) -> str:
     return f"{user_id}:{role}"
 
 user_id = "user_id"
-query = "machine learning for coordination compounds"
+#query = "machine learning for coordination compounds"
+query = "chromone and aminoquinoline schiff bases"
+#query = "machine learning and plasmonic graphene composites for heavy metal detection"
+#query = "relationship of enhancement factor to the thermoplasmonic properties in nanometals"
 citation_style = "american chemical society"
 citation_guides_folder = PROJECT_ROOT / "tools" / "citation_guides"
 
