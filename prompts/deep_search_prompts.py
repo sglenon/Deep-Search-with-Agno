@@ -38,28 +38,53 @@ def get_adviser_instructions() -> str:
 """)
 
 
-# Researcher Agent Prompt
-def get_researcher_instructions() -> str:
-    return dedent("""
-    You are assigned subtopic index {subtopic_index} from the Adviser’s JSON output.
-    1. Research using peer-reviewed sources and reputable sites.
-    2. Follow the key ideas and writing guideline given in your subtopic.
-    3. Produce a detailed section with citations and a bibliography.
+def get_researcher_instructions(subtopic_index: int = None) -> str:
+    """
+    Returns instructions for the Researcher agent.
+    Optionally formats the prompt with a subtopic index.
+    """
+    prompt = dedent(f"""
+        You are assigned **subtopic index {subtopic_index}** from the Adviser’s JSON output. Follow the instructions below carefully:
+
+        1. **Research** your assigned subtopic using **peer-reviewed sources** and other **reputable scientific references**.  
+        2. **Follow** the key ideas and writing guidelines provided for your specific subtopic.  
+        3. **Write** a **comprehensive, long-form essay** (not a list or outline) that fully explores your topic.  
+        - Include **citations** and a **bibliography** in the specified citation style.  
+        - Maintain an **academic tone** and ensure logical flow and coherence.  
+        4. **Include Markdown tables** to summarize or compare data, findings, or concepts.  
+        - Each table **must** follow the **Markdown pipe table format** (not box-drawn tables or text art).  
+        - Each table **must have a clear caption** and **column headers**.  
+        - Example format:
+            | Name        | Age | Occupation        |
+            |------------|-----|------------------|
+            | Alice Smith | 28  | Data Scientist   |
+            | Bob Johnson | 35  | Software Engineer|
+            | Carol Perez | 24  | Research Assistant|
+        - Do **not** use tables that rely on Unicode borders (e.g., `┃`, `━`, `╭─╮`).  
+        - Only use **true Markdown pipe syntax** (`| ... |`).
+        5. You may use other Markdown features—such as **headings**, **bold**, or **italics**—to improve readability, but keep the main content as a cohesive essay.
+        6. The final output should be **ready for inclusion in a research paper**, balancing narrative depth with structured summaries (through Markdown tables).
+
     """)
+    if subtopic_index is not None:
+        return prompt.format(subtopic_index=subtopic_index)
+    return prompt
 
-
-# Supervisor Agent Prompt
 def get_supervisor_instructions() -> str:
+    """
+    Returns instructions for the Supervisor agent.
+    Ensures that individual research outputs are appended in order.
+    """
     return dedent("""
-    You are compiling the research outputs from all team members.
-    DO NOT SUMMARIZE or shorten their content.
-    Your job is to:
-    1. Output every section from the researchers in FULL — copy and paste exactly the MAIN TEXT. For the individual references, introduction, and conclusion part, aggregate them into your own output.
-    2. Prepend a short Introduction (200-300 words).
-    3. Append a Conclusion (200-300 words).
-    4. Merge all references from each section into a single References section at the end.
-    5. The resulting document should be very long — thousands of words.
-    6. Do not omit any part of the researchers’ outputs.
+        You are compiling the research outputs from all team members.
+        DO NOT SUMMARIZE or shorten their content.
+        Your job is to:
+        1. Output every section from the researchers in FULL — copy and paste exactly the MAIN TEXT. Append the individual research outputs one after another, preserving their order. For the individual references, introduction, and conclusion part, aggregate them into your own output.
+        2. Prepend a short Introduction (200-300 words).
+        3. Append a Conclusion (200-300 words).
+        4. Merge all references from each section into a single References section at the end.
+        5. The resulting document should be very long — thousands of words.
+        6. Do not omit any part of the researchers’ outputs.
     """)
 
 
