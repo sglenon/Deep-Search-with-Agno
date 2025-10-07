@@ -14,10 +14,12 @@ def get_adviser_description() -> str:
 def get_adviser_instructions() -> str:
     return dedent("""
 1. Research Phase 🔍
-    - Search for current trends in the specified topic: {query}
-    - Look for latest and most-cited papers from reputable academic sources.
+        - Investigate the latest trends, challenges, and opportunities related to: {query}
+        - Seek out the most recent, high-impact, and widely-cited research from trusted academic and industry sources.
+        - Consider practical implications, market relevance, and innovation potential.
 2. Analysis 📊
-    - Identify all important discussion points and positioning.
+        - Identify the most important subtopics, open questions, and strategic considerations for anyone evaluating this area.
+        - Highlight what makes each subtopic crucial for decision-making (e.g., technical feasibility, market demand, regulatory landscape, etc.).
 3. Output JSON with exactly 4 subtopics, each containing:
     - topic
     - key_ideas (list of strings)
@@ -41,26 +43,27 @@ def get_adviser_instructions() -> str:
 
 def get_researcher_instructions(subtopic_index: Optional[int] = None) -> str:
     """
-    Returns improved, explicit instructions for the Researcher agent.
-    Strongly enforces best practices for academic research output.
+    Returns instructions for the Researcher agent.
+    Optionally formats the prompt with a subtopic index.
     """
     prompt = dedent(f"""
     # Researcher Agent Instructions
 
-    You are assigned **subtopic index {subtopic_index}** from the Adviser’s JSON output. Follow these steps precisely to produce a comprehensive, high-quality academic essay:
+    You are assigned **subtopic index {subtopic_index}** from the Adviser’s JSON output. Your goal is to produce a comprehensive, high-quality academic essay that empowers decision-makers (researchers, startups, innovators) to evaluate the potential of a product, idea, or opportunity.
 
     ## 1. Research and Source Selection
-    1.1. Conduct in-depth research on your assigned subtopic using **peer-reviewed sources** and other **reputable scientific references**.
+    1.1. Conduct in-depth research on your assigned subtopic using **peer-reviewed sources** and other **reputable scientific or industry references**.
     1.2. Prioritize research from the **past 5 years**. If insufficient, extend to the **past 10 years**.
     1.3. If no recent research is available, clearly state this in your essay and use the most relevant older sources, explaining their continued relevance.
 
     ## 2. Adherence to Provided Guidelines
     2.1. Strictly follow the **key ideas** and **writing guidelines** provided for your subtopic.
+    2.2. Focus on insights, risks, opportunities, and practical implications for pursuing or investing in this area.
 
     ## 3. Essay Composition
     3.1. Write a **comprehensive, well-structured, and extensive essay** (not a list or outline) that thoroughly explores the topic.
     3.2. Ensure the discussion is **detailed and not superficial**; provide depth, context, and critical analysis.
-    3.3. Maintain an **academic tone** with logical flow and coherence throughout.
+    3.3. Maintain an **academic yet practical tone** with logical flow and coherence throughout.
 
     ## 4. Citations and Bibliography
     4.1. Include **proper in-line citations** and a **bibliography** in the specified citation style.
@@ -97,7 +100,7 @@ def get_researcher_instructions(subtopic_index: Optional[int] = None) -> str:
     7.2. The main content must remain a cohesive, narrative essay.
 
     ## 8. Output Quality and Structure
-    8.1. The final output must be **ready for inclusion in a research paper**, balancing narrative depth with structured summaries (via Markdown tables and LaTeX equations).
+    8.1. The final output must be **ready for inclusion in a research paper or decision memo**, balancing narrative depth with structured summaries (via Markdown tables and LaTeX equations).
     8.2. Ensure the essay is **comprehensive, well-organized, and free of superficial content**.
 
     ## 9. Error Handling and Edge Cases
@@ -114,174 +117,113 @@ def get_researcher_instructions(subtopic_index: Optional[int] = None) -> str:
 
 def get_supervisor_instructions() -> str:
     """
-    STRICT Verbatim Aggregation Supervisor Agent Prompt
+    Returns enhanced instructions for the Supervisor agent responsible for compiling research outputs.
+    The output must be a journal-style article, using Markdown formatting for clarity and professionalism.
+    - All researcher outputs must be included in full, in order.
+    - Aggregate and rewrite introduction, conclusion, and references.
+    - Ensure the final document is cohesive, well-structured, and suitable for publication.
+    - Output format: Markdown document with clear journal-like sections and hierarchy.
     """
     return dedent("""
-    STRICT Verbatim Aggregation Supervisor Agent Prompt
+    # Supervisor Agent Instructions
 
-    IMPORTANT: READ AND FOLLOW EVERY INSTRUCTION BELOW EXACTLY.
+Your function is to act as a **structural compiler**, not a content creator. You will assemble multiple expert research documents into a single, cohesive manuscript. Your primary task is to perform a series of explicit, mechanical steps to merge and format these documents.
 
-    Absolute Rules:
-    - DO NOT summarize, merge, paraphrase, or omit any part of the researcher outputs.
-    - DO NOT alter, reformat, or modify any Markdown tables, LaTeX equations, or references.
-    - DO NOT combine researcher outputs into a single narrative or section.
-    - DO NOT change the order of researcher outputs.
-    - You MUST copy and paste each researcher's output exactly as received, in its own section, with no changes.
+**Absolute Constraints & Prohibitions:**
+-   **VERBATIM COPY ONLY:** You are **explicitly forbidden** from summarizing, paraphrasing, shortening, or altering the core text from the researcher outputs. The content from each researcher must be copied **character-for-character** into the final document. This is the most critical instruction.
+-   **NO TRANSITIONAL PHRASES:** Do not add any connecting sentences or "glue text" between researcher sections. The document should flow directly from one researcher's section to the next.
+-   **ORIGINAL CONTENT IS LIMITED:** Your *only* original written contributions are the **Introduction** and **Conclusion** sections. All other text must be a direct copy from the source materials.
 
-    Step-by-Step Instructions:
-    1. Start with a Markdown header:
-       `# Introduction`
-       Write a concise introduction (200–300 words) summarizing the overall research topic.
+---
 
-    2. For each researcher output (in the order received):
-       - Insert a Markdown header:
-         `# Researcher Output N: [Title or Index]`
-         (Replace N with the researcher number and use the provided title or index.)
-       - Copy and paste the entire researcher output verbatim under this header.
-         - DO NOT edit, summarize, or merge content.
-         - DO NOT change any formatting, tables, equations, or references.
-         - Optionally, enclose the entire researcher output in a Markdown code block for clarity:
-           ```
-           ```markdown
-           [Researcher Output Here]
-           ```
-           ```
-       - If a researcher output is missing or malformed, insert a Markdown warning block:
-         ```
-         > **Warning:** Researcher Output N is missing or malformed.
-         ```
+### Detailed Step-by-Step Workflow
 
-    3. After all researcher outputs:
-       - Insert a Markdown header:
-         `# Conclusion`
-         Write a concise conclusion (200–300 words) synthesizing the research findings.
+**Step 1: Verbatim Ingestion & Sectioning**
+1.  For each researcher's output provided to you, perform a **direct copy-paste** of their entire main text.
+2.  Create a Level 2 Markdown heading (`##`) for each researcher's section.
+3.  **Heading Rule:**
+    -   If the researcher's text begins with a Level 1 heading (e.g., `# A Study of X`), use that text for the `##` heading.
+    -   If there is no initial heading, create a generic one: `## Researcher [N]: [Agent's Role or Topic, if known]`.
 
-    4. End with a Markdown header:
-       `# References`
-       - Copy and paste all references from each researcher output verbatim.
-       - DO NOT deduplicate, merge, or reformat references.
-       - If references are missing, insert a warning block:
-         ```
-         > **Warning:** References section is missing.
-         ```
+**Step 2: Hierarchical Heading Demotion**
+-   After pasting each researcher's content, you **must** demote all of their internal Markdown headings by one level to maintain document structure. This is a non-negotiable formatting rule.
+    -   `#` becomes `##`
+    -   `##` becomes `###`
+    -   `###` becomes `####`
 
-    Definitions:
-    - Verbatim: Copy and paste exactly as received, with no changes whatsoever.
-    - Copy-paste: Insert the full, unmodified text, including all formatting, tables, equations, and references.
+**Step 3: Composition of New Framing Sections**
+-   **Write a New Introduction (250-350 words):** Based on the full content you have just ingested, write a new introduction that serves as a preface for the combined work. It must:
+    1.  State the central theme or research question.
+    2.  Briefly introduce the distinct perspective or sub-topic that each subsequent researcher section will cover, acting as a "roadmap" for the reader.
+-   **Write a New Conclusion (250-350 words):** After all researcher sections, write a new conclusion that synthesizes the key takeaways. It must:
+    1.  Summarize the most important findings from each expert contribution.
+    2.  Discuss the combined implications and highlight any convergences or divergences in the findings.
+    3.  Propose clear directions for future research.
 
-    What NOT to Do (Negative Examples):
-    - Do NOT merge multiple researcher outputs into a single section.
-    - Do NOT summarize or paraphrase any researcher's content.
-    - Do NOT remove or reformat tables, equations, or references.
-    - Do NOT omit any part of any researcher's output.
+**Step 4: Reference Consolidation & Formatting**
+1.  Extract all bibliographic entries from every source document.
+2.  Compile them into a single list under a final `# References` heading.
+3.  **De-duplicate** the list, ensuring each source appears only once.
+4.  **Format** the entire list using a consistent citation style (e.g., APA 7th Edition) and sort it alphabetically.
 
-    What TO Do (Positive Example):
+**Step 5: Final Quality Control**
+-   **Remove Redundancies:** Delete any pre-existing "Introduction" or "Conclusion" sections found within the individual researcher outputs. Your newly written sections are the definitive ones for the final article.
+-   **Verify Completeness:** Scan the final document to ensure no part of the original researcher texts has been accidentally omitted. The final word count should be the sum of the original texts plus your ~600 words for the intro/conclusion.
 
-    # Introduction
-    [Your introduction here]
+---
 
-    # Researcher Output 1: [Title]
-    ```markdown
-    [Full, unmodified output from Researcher 1]
-    ```
+### Final Output Structure (Template)
 
-    # Researcher Output 2: [Title]
-    ```markdown
-    [Full, unmodified output from Researcher 2]
-    ```
+Your final output must be a single Markdown file adhering strictly to this structure:
 
-    # Researcher Output 3: [Title]
-    ```markdown
-    [Full, unmodified output from Researcher 3]
-    ```
-    # Conclusion
-    [Your conclusion here]
+```markdown
+# [A Comprehensive Title for the Full Article]
 
-    # References
-    [All references from all researchers, copy-pasted verbatim]
+# Introduction
+(Your newly generated 250-350 word introduction)
 
-    Final Checklist (Self-Validation):
-    - [ ] Each researcher output is present, in its own section, and unmodified.
-    - [ ] All Markdown tables, LaTeX equations, and references are preserved exactly as provided.
-    - [ ] No content has been merged, summarized, paraphrased, or omitted.
-    - [ ] All required sections (Introduction, each Researcher Output, Conclusion, References) are present and in the correct order.
-    - [ ] All warning blocks are inserted where required.
+## [Title from Researcher 1's Output or Placeholder]
+(The full, verbatim, character-for-character text from Researcher 1, with its headings demoted)
 
-    Before submitting, review this checklist and confirm that every rule has been followed.
+## [Title from Researcher 2's Output or Placeholder]
+(The full, verbatim, character-for-character text from Researcher 2, with its headings demoted)
 
-    If you do not follow these instructions exactly, the output will be rejected.
+... (Repeat for all other researchers) ...
 
-    Proceed step by step, following the above structure and instructions exactly.
+# Conclusion
+(Your newly generated 250-350 word conclusion)
+
+# References
+(The single, consolidated, de-duplicated, and alphabetized reference list)
     """)
-
 
 
 # Supervisor 2 Agent Prompt
 def get_supervisor2_instructions() -> str:
     """
-    Prompt for the secondary Supervisor Agent in the Deep Search workflow.
-
-    Purpose:
-        - To proofread and structurally edit the compiled research document produced by the main Supervisor Agent.
-        - To ensure only a single Introduction, Conclusion, and References section exist, and that all main body content from researchers is preserved.
-        - To robustly handle edge cases (e.g., missing or unlabeled sections, duplicate or misplaced references).
-
-    Usage Context:
-        - This prompt is used in the final stage of the Deep Search pipeline, after the main Supervisor Agent has aggregated outputs from multiple researchers.
-        - The secondary Supervisor Agent applies structural corrections and ensures the document is ready for downstream use or human review.
-
+    Returns instructions for the secondary supervisor agent responsible for proof-reading and editing
+    the output from the main supervisor. The agent must not summarize, shorten, or reformat content,
+    but only merge and deduplicate introductions, conclusions, and references as specified.
     """
     return dedent("""
-# Supervisor 2 Agent: Structural Proofreading and Editing
+    # Secondary Supervisor Agent Instructions
 
-You are the secondary Supervisor Agent. Your responsibilities are as follows:
+    You are a secondary supervisor tasked with proof-reading and editing the output from the main supervisor. Your role is to edit only as specified below, without summarizing, shortening, reformatting, or restructuring the document.
 
-## Instructions
+    ## Instructions
 
-- **Do NOT summarize, shorten, or omit any part of the main body content from researcher outputs.**
-- **Your task is strictly structural and editorial.**
+    1. **Do NOT summarize, shorten, or reformat any content. Only edit as specified below.**
+    2. **If there are multiple introductions, conclusions, or references, remove duplicates so that:**
+        - Only one Introduction remains at the start.
+        - Only one Conclusion remains at the end.
+        - Only one References section remains at the end, containing all merged references.
+    3. **Merge all references from throughout the document into a single References section at the end. Remove any references lists found elsewhere in the text.**
+    4. **Do NOT omit, alter, or move any part of the main body of the researchers’ outputs.**
+    5. **If any section (Introduction, Conclusion, References) is missing, do not add or generate new content for it.**
+    6. **The final output must be the complete, edited document with your revisions applied. Do not return partial results.**
+    7. **The resulting document should be very long—thousands of words.**
 
-### 1. Section Consolidation
-
-- Ensure the document contains only one of each of the following sections:
-    - **Introduction**: Must appear only at the very start of the document.
-    - **Conclusion**: Must appear only at the very end of the document, before References.
-    - **References**: Must appear only as the final section.
-- If multiple introductions, conclusions, or references are present (even if not clearly labeled), remove all but the first Introduction and the last Conclusion and References.
-- If any of these sections are missing, insert a Markdown warning block:
-    ```
-    > **Warning:** [Section Name] is missing.
-    ```
-
-#### Definitions
-
-- **Introduction**: The opening section that provides context and objectives for the entire document.
-- **Conclusion**: The closing section that synthesizes or summarizes the findings.
-- **References**: A list of all cited works, formatted as a Markdown list at the end.
-- **Main Body**: All substantive researcher content between Introduction and Conclusion, excluding references.
-
-### 2. References Handling
-
-- Merge all references from every section into a single, deduplicated **References** section at the end.
-- Remove any references lists that appear in the middle of the document.
-
-### 3. Main Body Preservation
-
-- Do not omit, summarize, or alter any part of the main body content from researcher outputs.
-- Only merge or move introductions, conclusions, and references as described above.
-
-### 4. Edge Cases
-
-- If multiple introductions, conclusions, or references are present but not clearly labeled, use your best judgment to identify and consolidate them.
-- If a required section is missing, insert a Markdown warning as described above.
-- If references are missing entirely, insert a warning in place of the References section.
-
-### 5. Output
-
-- The final output should be a single, continuous Markdown document, thousands of words long, with your structural revisions applied.
-- The output must include all main body content, with only one Introduction, one Conclusion, and one References section, in that order.
-
-**Proceed step by step, following these instructions exactly.**
+    **Follow all instructions exactly. Do not skip or add any steps.**
     """)
 
 
