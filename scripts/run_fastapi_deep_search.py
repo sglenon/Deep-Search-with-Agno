@@ -163,6 +163,26 @@ try:
     # The FastAPI app object (for ASGI servers, testing, etc.)
     app = fastapi_app.get_app()
 
+    # === Add custom endpoint for deep search ===
+    from fastapi import Body
+    from pydantic import BaseModel
+    from fastapi.responses import JSONResponse
+
+    class DeepSearchRequest(BaseModel):
+        query: str
+
+    @app.post("/deep_search", response_class=JSONResponse, tags=["Deep Search"])
+    async def deep_search(request: DeepSearchRequest):
+        """
+        Run the deep search workflow with a custom query.
+        """
+        try:
+            response = workflow.print_response(request.query, markdown=True)
+            return {"result": response}
+        except Exception as e:
+            logging.error("Error in /deep_search endpoint: %s", str(e), exc_info=True)
+            return JSONResponse(status_code=500, content={"error": str(e)})
+
     # Entrypoint for running as a FastAPI server
     if __name__ == "__main__":
         # Read server config from environment variables (with defaults)

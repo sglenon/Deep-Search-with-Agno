@@ -55,9 +55,9 @@ def agent_id(user_id: str, role: str) -> str:
 
 
 # === Defaults ===
-user_id = "user_id"  # replace dynamically if needed
+user_id = "user_id"  # replace dynamically if needed"
+citation_style = "american psychological association"
 query = "machine learning for coordination compounds"
-citation_style = "american chemical society"
 
 
 # === Workflow Builder ===
@@ -151,7 +151,44 @@ def build_deep_search_workflow(
             Step(name="Cleanup", agent=Supervisor2),
             Step(name="Formatting", agent=Citation),
         ],
+    # === Patch: Validate researcher outputs before aggregation ===
+    # This assumes the workflow engine allows post-processing hooks or can be adapted to do so.
+    # If not, this logic should be integrated into the agent or step execution.
+    # Example for a custom workflow engine:
+    # for step in workflow.steps:
+    #     if step.name.startswith("Agent"):
+    #         step.output = validate_researcher_output(step.output)
+    # If using a framework, adapt as needed to ensure validation is applied before Supervisor step.
     )
+# === Validation Utility ===
+import re
+
+def validate_researcher_output(output: str) -> str:
+    """Validate researcher output for required tables, equations, and reference DOIs/URLs."""
+    warnings = []
+    # Check for Markdown pipe table
+    if not re.search(r"^\s*\|.*\|", output, re.MULTILINE):
+        warnings.append("> **Warning:** Required Markdown table is missing.")
+    # Check for Unicode box-drawing characters
+    if re.search(r"[┃━╭╮╯╰]", output):
+        warnings.append("> **Warning:** Table format is incorrect.")
+    # Check for LaTeX equations
+    if not re.search(r"\$.*?\$|\$\$.*?\$\$", output, re.DOTALL):
+        if "> **Note:** No equations are relevant for this subtopic." not in output:
+            warnings.append("> **Warning:** No LaTeX equations found and no justification provided.")
+    # Check references for DOI/URL
+    ref_lines = [line for line in output.splitlines() if re.match(r"^\s*[\d•]\s+[A-Z][a-zA-Z]+,", line)]
+    missing_doi = False
+    for line in ref_lines:
+        if not re.search(r"(doi\.org|http[s]?://)", line):
+            missing_doi = True
+            break
+    if missing_doi and "> **Warning:** Some references are missing DOIs or URLs." not in output:
+        warnings.append("> **Warning:** Some references are missing DOIs or URLs.")
+    # Append warnings at the end
+    if warnings:
+        output = output.rstrip() + "\n" + "\n".join(warnings)
+    return output
 
 
 # === Run Workflow (for standalone execution) ===
