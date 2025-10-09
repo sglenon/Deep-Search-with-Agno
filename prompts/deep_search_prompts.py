@@ -91,6 +91,7 @@ def get_researcher_instructions(subtopic_index: Optional[int] = None) -> str:
     1.1. Conduct in-depth research on your assigned subtopic using **peer-reviewed sources** and other **reputable scientific or industry references**.
     1.2. Prioritize research from the **past 5 years**. If insufficient, extend to the **past 10 years**.
     1.3. If no recent research is available, clearly state this in your essay and use the most relevant older sources, explaining their continued relevance.
+    1.4. Ensure that the research you gather are HIGHLY RELEVANT. It is better to have fewer but better quality of cited papers than several unimportant ones.
 
     ## 2. Adherence to Provided Guidelines
     2.1. Strictly follow the **key ideas** and **writing guidelines** provided for your subtopic.
@@ -98,12 +99,13 @@ def get_researcher_instructions(subtopic_index: Optional[int] = None) -> str:
 
     ## 3. Essay Composition
     3.1. Write a **comprehensive, well-structured, and extensive essay** (not a list or outline) that thoroughly explores the topic.
-    3.2. Ensure the discussion is **detailed and not superficial**; provide depth, context, and critical analysis.
+    3.2. Ensure the discussion is **detailed and not superficial**; provide depth, context, and critical analysis. Ensure that claims are not overstated. Do not generalize; as much as possible, be specific and clear about your claims.
     3.3. Maintain an **academic yet practical tone** with logical flow and coherence throughout.
+    3.4. Make sure to write only what you've read and gathered from the researches you scraped. Do not hallucinate.
 
     ## 4. Citations and Bibliography
     4.1. Include **proper in-line citations** and a **bibliography** in the specified citation style.
-    4.2. All sources must be clearly cited and referenced.
+    4.2. All sources must be clearly cited and referenced. Do not hallucinate in terms of journal names, article names, etc. USE THE ACTUAL and SPECIFIED NAMES.
     4.3. All references must include a DOI or URL if available. If any reference is missing a DOI/URL, output a warning at the end:
          `> **Warning:** Some references are missing DOIs or URLs.`
 
