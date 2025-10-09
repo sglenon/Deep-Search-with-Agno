@@ -12,23 +12,17 @@ from agents.deep_search_agents import (
     create_citation_agent,
     create_supervisor_agent,
     make_researcher,
+    create_evaluator,
 )
 
 # === Import prompts ===
 from prompts.deep_search_prompts import (
     get_adviser_instructions as ADVISER_INSTRUCTIONS,
-)
-from prompts.deep_search_prompts import (
     get_citation_instructions as CITATION_INSTRUCTIONS,
-)
-from prompts.deep_search_prompts import (
     get_researcher_instructions as RESEARCHER_INSTRUCTIONS,
-)
-from prompts.deep_search_prompts import (
     get_supervisor2_instructions as SUPERVISOR2_INSTRUCTIONS,
-)
-from prompts.deep_search_prompts import (
     get_supervisor_instructions as SUPERVISOR_INSTRUCTIONS,
+    get_evaluator_instructions as EVALUATOR_INSTRUCTIONS
 )
 
 # === Setup ===
@@ -73,6 +67,7 @@ def build_deep_search_workflow(
     CITATION_INSTRUCTIONS,
     citation_style,
     citation_guides_folder,
+    EVALUATOR_INSTRUCTIONS,
 ):
     Adviser = create_adviser_agent(
         llm,
@@ -132,8 +127,16 @@ def build_deep_search_workflow(
         "Formats results into proper citations.",
         CITATION_INSTRUCTIONS(citation_style=citation_style,
             citation_guides_folder=citation_guides_folder))
+    
+    Evaluator = create_evaluator(
+        memory,
+        agent_id,
+        user_id,
+        "Evaluator to judge the output of research pipeline.",
+        EVALUATOR_INSTRUCTIONS
+    )
 
-    return Workflow(
+    workflow = Workflow(
         name="Deep Search Pipeline",
         workflow_id="deep_search_team",
         steps=[
@@ -147,6 +150,7 @@ def build_deep_search_workflow(
             Step(name="Synthesis", agent=Supervisor),
             Step(name="Cleanup", agent=Supervisor2),
             Step(name="Formatting", agent=Citation),
+            Step(name="Evaluation", agent=Evaluator)
         ],
     # === Patch: Validate researcher outputs before aggregation ===
     # This assumes the workflow engine allows post-processing hooks or can be adapted to do so.
@@ -157,6 +161,7 @@ def build_deep_search_workflow(
     #         step.output = validate_researcher_output(step.output)
     # If using a framework, adapt as needed to ensure validation is applied before Supervisor step.
     )
+    return workflow
 # === Validation Utility ===
 import re
 
@@ -202,6 +207,7 @@ if __name__ == "__main__":
         CITATION_INSTRUCTIONS,
         citation_style,
         os.path.join(PROJECT_ROOT, "tools", "citation_guides"),
+        EVALUATOR_INSTRUCTIONS
     )
     topic_response = workflow.print_response(query, markdown=True)
     print(topic_response)

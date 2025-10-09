@@ -6,8 +6,6 @@ import logging
 import datetime
 from pathlib import Path
 from dotenv import load_dotenv
-from queue import Queue
-from logging.handlers import QueueHandler, QueueListener
 import atexit
 
 
@@ -17,14 +15,14 @@ load_dotenv()
 # === Logging Setup ===
 def setup_logging():
     """
-    Configures asynchronous logging to file and stdout.
-    Logs are written asynchronously to logs/ (relative to project root).
+    Configures synchronous logging to file and stdout.
+    Logs are written synchronously to logs/ (relative to project root).
     If the log directory cannot be created or is not writable, aborts execution.
-    Ensures async writing to both console and file.
+    Ensures writing to both console and file.
     Also redirects sys.stdout and sys.stderr to the logger.
     """
     logger = logging.getLogger()
-    if getattr(logger, "_async_logging_setup", False):
+    if getattr(logger, "_sync_logging_setup", False):
         return logger  # Prevent duplicate handlers
 
     # --- Log directory: logs/ ---
@@ -44,31 +42,23 @@ def setup_logging():
     # Use a unique log file per run: include date and time down to seconds
     log_file = logs_dir / f"run_deep_search_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
 
-    # --- Asynchronous logging setup ---
-    log_queue = Queue(-1)
+    # --- Synchronous logging setup ---
     file_handler = logging.FileHandler(log_file, encoding="utf-8", delay=False)
     stream_handler = logging.StreamHandler(sys.stdout)
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
     file_handler.setFormatter(formatter)
     stream_handler.setFormatter(formatter)
 
-    # QueueListener will handle both file and stream handlers
-    listener = QueueListener(log_queue, file_handler, stream_handler, respect_handler_level=True)
-    listener.start()
-    atexit.register(listener.stop)
-
-    # Set up root logger with QueueHandler
-    queue_handler = QueueHandler(log_queue)
     logging.basicConfig(
         level=logging.INFO,
-        handlers=[queue_handler],
+        handlers=[file_handler, stream_handler],
         force=True,
     )
 
-    logger._async_logging_setup = True  # Mark as set up
+    logger._sync_logging_setup = True  # Mark as set up
 
     logging.info("=== Script run_deep_search.py started ===")
-    logging.info(f"Logs are being written asynchronously to: {log_file}")
+    logging.info(f"Logs are being written synchronously to: {log_file}")
 
     # --- Redirect unhandled exceptions ---
     def handle_exception(exc_type, exc_value, exc_traceback):
@@ -79,20 +69,27 @@ def setup_logging():
 
     sys.excepthook = handle_exception
 
-    # --- Redirect stdout/stderr to logger asynchronously ---
+    # --- Redirect sys.stdout and sys.stderr to logger using LoggerWriter ---
     class LoggerWriter:
-        def __init__(self, level):
+        def __init__(self, logger, level):
+            self.logger = logger
             self.level = level
             self._buffer = ""
-        def write(self, message):
-            if message and not message.isspace():
-                for line in message.rstrip().splitlines():
-                    self.level(line.rstrip())
-        def flush(self):
-            pass
 
-    sys.stdout = LoggerWriter(logging.getLogger().info)
-    sys.stderr = LoggerWriter(logging.getLogger().error)
+        def write(self, message):
+            # Buffer until newline to avoid partial log lines
+            self._buffer += message
+            while "\n" in self._buffer:
+                line, self._buffer = self._buffer.split("\n", 1)
+                if line.strip() != "":
+                    self.logger.log(self.level, line)
+        def flush(self):
+            if self._buffer.strip() != "":
+                self.logger.log(self.level, self._buffer.strip())
+            self._buffer = ""
+
+    sys.stdout = LoggerWriter(logger, logging.INFO)
+    sys.stderr = LoggerWriter(logger, logging.ERROR)
 
     return logger
 
@@ -114,6 +111,7 @@ from prompts.deep_search_prompts import (
     get_researcher_instructions as RESEARCHER_INSTRUCTIONS,
     get_supervisor2_instructions as SUPERVISOR2_INSTRUCTIONS,
     get_supervisor_instructions as SUPERVISOR_INSTRUCTIONS,
+    get_evaluator_instructions as EVALUATOR_INSTRUCTIONS,
 )
 
 # === Setup ===
@@ -149,11 +147,13 @@ try:
         CITATION_INSTRUCTIONS=CITATION_INSTRUCTIONS,
         citation_style=citation_style,
         citation_guides_folder=citation_guides_folder,
+        EVALUATOR_INSTRUCTIONS=EVALUATOR_INSTRUCTIONS()
     )
     
     topic_response = workflow.print_response(query, markdown=True)
     logging.info("Workflow executed successfully.")
     logging.info(f"Response:\n{topic_response}")
+
 
 except Exception as e:
     logging.error("An error occurred during workflow execution: %s", str(e), exc_info=True)

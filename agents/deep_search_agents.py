@@ -16,9 +16,6 @@ if PROJECT_ROOT not in sys.path:
 from tools.philippines_search_tool import PhilippinesSearchTool
 from tools.sci_paper_search_tool import SciResTool
 
-
-
-
 # === Adviser Agent ===
 def create_adviser_agent(llm, memory, agent_id, user_id, description, instructions):
     """
@@ -107,4 +104,20 @@ def create_citation_agent(llm, memory, agent_id, user_id, description, instructi
         markdown=True,
         memory=memory,
         user_id=agent_id(user_id, role="citation_agent"),
+    )
+
+# === Evaluation Agent ===
+def create_evaluator(
+     memory, agent_id, user_id, description, instructions, role="evaluator"
+):
+    return Agent(
+        name="Evaluator",
+        model=OpenAIChat("gpt-5"),
+        add_history_to_messages=True,
+        num_history_responses=3,
+        description=dedent(description),
+        instructions=dedent(instructions),
+        markdown=True,
+        memory=memory,
+        user_id=agent_id(user_id, role=role),
     )
