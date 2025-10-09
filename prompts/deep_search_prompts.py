@@ -13,6 +13,7 @@ def get_adviser_description() -> str:
 
 def get_adviser_instructions(query, citation_style) -> str:
     return dedent(f"""
+Output ONLY the JSON file in the format below. Do not include any explanations, extra text, or formatting. The output must be valid JSON and match the structure exactly.
 You are a research adviser with broad expertise across scientific, technical, and industry domains. Your goal is to help decision-makers, researchers, and innovators identify important subtopics for further investigation, highlighting key questions, gaps, and opportunities.
 
 1. Research Phase
