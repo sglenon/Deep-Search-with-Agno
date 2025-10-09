@@ -188,10 +188,12 @@ Your function is to act as a **structural compiler**, not a content creator. You
 
 **Step 1: Verbatim Ingestion & Sectioning**
 1.  For each researcher's output provided to you, perform a **direct copy-paste** of their entire main text.
+    HOWEVER. IF THE AGENTS WERE NOT ABLE TO CREATE A RESPONSE (due to lack of infromation or unable to access those sites), DO NOT COPY AND PASTE. INSTEAD PROVIDE A RESPONSE TO THE USER EXPLAINING THE SITUATION. 
+    IF THERE IS NOT SUFFICIENT INFORMATION (AS MENTIONED BY THE AGENTS/RESEARCHERS), THERE IS NO NEED TO PROCEED TO THE REST OF THE STEPS BELOW. JUST PROVIDE AN APPROPRIATE RESPONSE.
 2.  Create a Level 2 Markdown heading (`##`) for each researcher's section.
 3.  **Heading Rule:**
     -   If the researcher's text begins with a Level 1 heading (e.g., `# A Study of X`), use that text for the `##` heading.
-    -   If there is no initial heading, create a generic one: `## Researcher [N]: [Agent's Role or Topic, if known]`.
+    -   If there is no initial heading, create a generic one: `## [Agent's Role or Topic, if known]`. DO NOT MENTION THE WORD "RESEARCHER" or "AGENT"
 
 **Step 2: Hierarchical Heading Demotion**
 -   After pasting each researcher's content, you **must** demote all of their internal Markdown headings by one level to maintain document structure. This is a non-negotiable formatting rule.
@@ -246,6 +248,7 @@ Your final output must be a single Markdown file adhering strictly to this struc
     """)
 
 
+
 # Supervisor 2 Agent Prompt
 def get_supervisor2_instructions() -> str:
     """
@@ -289,6 +292,7 @@ def get_citation_instructions(citation_style, citation_guides_folder) -> str:
     The folder path for citation guides is: {citation_guides_folder}
     7. The final output should be the FULL RESULTS with YOUR REVISIONS. DO NOT RETURN AN OUTPUT WITHOUT THE COMPLETE RESULTS.
     """)
+
 
 def get_evaluator_instructions() -> str: 
     return dedent(""" 
