@@ -81,7 +81,7 @@ def create_supervisor_agent(
     """
     return Agent(
         name="Supervisor" if role == "supervisor" else "Supervisor 2",
-        model=OpenAIChat(llm),
+        model=OpenAIChat("gpt-4.1"),
         add_history_to_messages=True,
         num_history_responses=3,
         description=dedent(description),

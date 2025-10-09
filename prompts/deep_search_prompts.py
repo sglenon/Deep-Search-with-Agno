@@ -1,6 +1,6 @@
 from textwrap import dedent
 from typing import Optional
-
+import logging
 
 # Adviser Agent Prompts
 def get_adviser_description() -> str:
@@ -11,32 +11,68 @@ def get_adviser_description() -> str:
     """)
 
 
-def get_adviser_instructions() -> str:
-    return dedent("""
-1. Research Phase 🔍
-        - Investigate the latest trends, challenges, and opportunities related to: {query}
-        - Seek out the most recent, high-impact, and widely-cited research from trusted academic and industry sources.
-        - Consider practical implications, market relevance, and innovation potential.
-2. Analysis 📊
-        - Identify the most important subtopics, open questions, and strategic considerations for anyone evaluating this area.
-        - Highlight what makes each subtopic crucial for decision-making (e.g., technical feasibility, market demand, regulatory landscape, etc.).
-3. Output JSON with exactly 4 subtopics, each containing:
-    - topic
-    - key_ideas (list of strings)
-    - writing_guideline (string)
+def get_adviser_instructions(query, citation_style) -> str:
+    return dedent(f"""
+You are a research adviser with broad expertise across scientific, technical, and industry domains. Your goal is to help decision-makers, researchers, and innovators identify important subtopics for further investigation, highlighting key questions, gaps, and opportunities.
+
+1. Research Phase
+    - Survey the current landscape for the specified topic: {query}
+    - Identify recent trends, influential research, and areas of active debate or uncertainty.
+    - Focus on aspects relevant to scientific advancement, practical applications, and future directions.
+
+2. Analysis
+    - Pinpoint important discussion points, open questions, knowledge gaps, and opportunities for impact.
+    - Consider implications for research, innovation, policy, and practice.
+
+3. Output JSON with exactly 3 subtopics, each containing:
+    - topic (a clear and descriptive name for the research area)
+    - key_ideas (list of general guide questions or points to address, e.g.):
+        - What are the main challenges and opportunities in this subtopic?
+        - What recent advancements or trends are most relevant?
+        - What gaps or unresolved questions exist in current research?
+        - What are the practical, theoretical, or societal implications?
+        - Who are the key stakeholders or communities affected?
+    - writing_guidelines (a general overview of how to approach the topic, e.g.):
+        - Summarize the current state of research and highlight open questions.
+        - Address the guide questions listed in key_ideas.
+        - Emphasize relevance to scientific progress, practical applications, and future research directions.
+        - Provide balanced analysis of strengths, limitations, and opportunities.
     - word_count (string)
+
 4. Example format:
 {{
   "title": "Topic Title",
   "citation_style": "{citation_style}",
-  "topics": [
-    {{
-      "topic": "Subtopic 1 Name",
-      "key_ideas": ["key point 1", "key point 2"],
-      "writing_guideline": "Describe how to present findings.",
-      "word_count": "1000-2000 words"
-    }}
-  ]
+  "subtopic_1": {{
+    "topic": "Subtopic 1: [Descriptive Name]",
+    "key_ideas" : [
+        "What are the main challenges and opportunities in this subtopic?",
+        "What recent advancements or trends are most relevant?",
+        "What gaps or unresolved questions exist in current research?"
+    ],
+    "writing_guidelines" : "Summarize the current state of research, highlight open questions, and address the guide questions.", 
+    "word_count": "500-750 words"
+    }},
+  "subtopic_2": {{
+    "topic": "Subtopic 2: [Descriptive Name]",
+    "key_ideas" : [
+        "What are the practical, theoretical, or societal implications?",
+        "Who are the key stakeholders or communities affected?",
+        "What are the strengths and limitations of current approaches?"
+    ],
+    "writing_guidelines" : "Provide a balanced analysis of implications, stakeholders, and limitations.", 
+    "word_count": "500-750 words"
+    }},
+  "subtopic_3": {{
+    "topic": "Subtopic 3: [Descriptive Name]",
+    "key_ideas" : [
+        "What future directions or research gaps exist?",
+        "How does this subtopic connect to broader trends?",
+        "What recommendations can be made for researchers or practitioners?"
+    ],
+    "writing_guidelines" : "Discuss future directions, connect to broader trends, and provide actionable recommendations.", 
+    "word_count": "500-750 words"
+    }},
 }}
 """)
 
@@ -49,7 +85,7 @@ def get_researcher_instructions(subtopic_index: Optional[int] = None) -> str:
     prompt = dedent(f"""
     # Researcher Agent Instructions
 
-    You are assigned **subtopic index {subtopic_index}** from the Adviser’s JSON output. Your goal is to produce a comprehensive, high-quality academic essay that empowers decision-makers (researchers, startups, innovators) to evaluate the potential of a product, idea, or opportunity.
+    You are assigned **subtopic_{subtopic_index}** from the Adviser’s JSON output. Your goal is to produce a comprehensive, high-quality academic essay that empowers decision-makers (researchers, startups, innovators) to evaluate the potential of a product, idea, or opportunity.
 
     ## 1. Research and Source Selection
     1.1. Conduct in-depth research on your assigned subtopic using **peer-reviewed sources** and other **reputable scientific or industry references**.
@@ -228,8 +264,8 @@ def get_supervisor2_instructions() -> str:
 
 
 # Citation Agent Prompt
-def get_citation_instructions() -> str:
-    return dedent("""
+def get_citation_instructions(citation_style, citation_guides_folder) -> str:
+    return dedent(f"""
     You are tasked with ensuring the output adheres to the requested citation style: {citation_style}.
     The citation guides are stored in markdown files within a folder. Your job is to:
     1. Access the folder containing citation guides.

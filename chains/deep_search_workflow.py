@@ -80,7 +80,7 @@ def build_deep_search_workflow(
         agent_id,
         user_id,
         "Expert research adviser with decades of publishing experience.",
-        ADVISER_INSTRUCTIONS().format(query=query, citation_style=citation_style),
+        ADVISER_INSTRUCTIONS(query=query, citation_style=citation_style),
     )
 
     Researcher1 = make_researcher(
@@ -88,24 +88,24 @@ def build_deep_search_workflow(
         memory,
         agent_id,
         user_id,
-        subtopic_index=0,
-        researcher_instructions=RESEARCHER_INSTRUCTIONS().format(subtopic_index=0),
+        subtopic_index=1,
+        researcher_instructions=RESEARCHER_INSTRUCTIONS(subtopic_index=1),
     )
     Researcher2 = make_researcher(
         llm,
         memory,
         agent_id,
         user_id,
-        subtopic_index=1,
-        researcher_instructions=RESEARCHER_INSTRUCTIONS().format(subtopic_index=1),
+        subtopic_index=2,
+        researcher_instructions=RESEARCHER_INSTRUCTIONS(subtopic_index=2),
     )
     Researcher3 = make_researcher(
         llm,
         memory,
         agent_id,
         user_id,
-        subtopic_index=2,
-        researcher_instructions=RESEARCHER_INSTRUCTIONS().format(subtopic_index=2),
+        subtopic_index=3,
+        researcher_instructions=RESEARCHER_INSTRUCTIONS(subtopic_index=3),
     )
 
     Supervisor = create_supervisor_agent(
@@ -130,11 +130,8 @@ def build_deep_search_workflow(
         agent_id,
         user_id,
         "Formats results into proper citations.",
-        CITATION_INSTRUCTIONS().format(
-            citation_style=citation_style,
-            citation_guides_folder=citation_guides_folder,
-        ),
-    )
+        CITATION_INSTRUCTIONS(citation_style=citation_style,
+            citation_guides_folder=citation_guides_folder))
 
     return Workflow(
         name="Deep Search Pipeline",
