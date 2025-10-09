@@ -152,14 +152,6 @@ def build_deep_search_workflow(
             Step(name="Formatting", agent=Citation),
             Step(name="Evaluation", agent=Evaluator)
         ],
-    # === Patch: Validate researcher outputs before aggregation ===
-    # This assumes the workflow engine allows post-processing hooks or can be adapted to do so.
-    # If not, this logic should be integrated into the agent or step execution.
-    # Example for a custom workflow engine:
-    # for step in workflow.steps:
-    #     if step.name.startswith("Agent"):
-    #         step.output = validate_researcher_output(step.output)
-    # If using a framework, adapt as needed to ensure validation is applied before Supervisor step.
     )
     return workflow
 # === Validation Utility ===
