@@ -1,5 +1,47 @@
+# Python virtual environments
 .venv
+venv/
+ENV/
+env/
+
+# Environment variable files
 .env
-*.md
+.env.*
+!.env.example
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.pytest_cache/
+coverage/
+.cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+*.manifest
+*.spec
+
+# Logs
 /logs
-*.log 
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE/editor configs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Remove this if you want to keep markdown docs in version control
+# *.md
